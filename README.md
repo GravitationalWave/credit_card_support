@@ -1,9 +1,11 @@
-== Why?
+Why?
+====
 
 Because I can!
 
 
-== What
+What?
+=====
 
 It is somewhat a ripp-off from
 * https://github.com/tobias/credit_card_validator
