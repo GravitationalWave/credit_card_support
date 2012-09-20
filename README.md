@@ -25,9 +25,9 @@ For better understanding read the source and RSpec.
 Validations support
 -------------------
 
-=== Define
+### Define
 
-==== ActiveRecord or Mongoid
+#### ActiveRecord or Mongoid
 
 ```ruby
 class CreditCard < ActiveRecord::Base
@@ -45,7 +45,7 @@ class CreditCard < ActiveRecord::Base
 end
 ```
 
-==== Only ActiveModel
+#### Only ActiveModel
 
 ```ruby
 class CreditCard
@@ -68,7 +68,7 @@ class CreditCard
 end
 ```
 
-=== Use
+### Use
 
 After you have defined your CreditCard
 
