@@ -1,41 +1,40 @@
 module CreditCardSupport
 
-  # Usage:
-  #
-  # @example Get Luhn check code
-  #   Luhn.new("12345").checksum   # returns 9
-  #
-  # @example See if Luhn check code is valid
-  #   Luhn.is_valid?("123458")      # returns false
-  #   Luhn.is_valid?("123459")      # returns true
-
   class Luhn
     MAGIC = [7, 3, 1]
 
-    attr_accessor :number
+    attr_accessor :full_number
 
-    def self.is_valid? code
-      code = code.to_s
-      return false unless code.length > 0
-      self.new(code[0, code.length-1]).checksum.to_s == code[-1, 1]
+    def initialize(full_number)
+      self.full_number = full_number
     end
 
-    def initialize code
-      @number = code
+    def full_number=(full_number)
+      @full_number = full_number.gsub(/[^0-9]/, '').to_s
     end
 
-    def checksum
-      parts       = number.split //
+    def number_part
+      full_number[0, full_number.length-1] if full_number
+    end
 
-      i = 0
-      multiplied  = parts.map(&:to_i).collect do |part|
-        m = part * MAGIC[i]
-        i = (i==2) ? 0 : i.succ
-        m
+    def checksum_part
+      full_number[-1, 1] if full_number
+    end
+
+    def valid?
+      parts   = full_number.split(//).reverse
+
+      other   = true
+      parts   = parts.collect do |part|
+        (other = !other) ? part : part*2
       end
 
-      summarized  = multiplied.inject(:+)
-      summarized % 10
+      sum     = parts.join("").split(//).map(&:to_i).inject(:+)
+      sum % 10 == 0
+    end
+
+    def invalid?
+      !valid?
     end
 
   end
