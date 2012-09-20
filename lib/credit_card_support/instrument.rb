@@ -131,11 +131,11 @@ module CreditCardSupport
     end
 
     def expiry_year=(expiry_year)
-      @expiry_year = expiry_year.to_i
+      @expiry_year = expiry_year.to_i if expiry_year
     end
 
     def expiry_month=(expiry_month)
-      @expiry_month = expiry_month.to_i
+      @expiry_month = expiry_month.to_i if expiry_month
     end
 
     def expiry_year

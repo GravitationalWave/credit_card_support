@@ -35,11 +35,10 @@ class CreditCard < ActiveRecord::Base
   attr_accessable :number, :expiry_year, :expiry_month
 
   validates :number, credit_card: {
-                                    # credit_card_config: :local_method_name
-                                    expiry_year: :expiry_year,
-                                    expiry_month: :expiry_month,
-                                    allowed_issuers: [:visa, :mastercard],
-                                    allow_testcards: !Rails.env.production?
+                                    expiry_year: :expiry_year,                # default: :expiry_year
+                                    expiry_month: :expiry_month,              # default: :expiry_month
+                                    allowed_issuers: [:visa, :mastercard],    # default: all known issuers
+                                    allow_testcards: !Rails.env.production?   # default: False
                                   }
 
 end
@@ -58,11 +57,10 @@ class CreditCard
   attr_accessable :number, :expiry_year, :expiry_month
 
   validates :number, credit_card: {
-                                    # credit_card_config: :local_method_name
-                                    expiry_year: :expiry_year,
-                                    expiry_month: :expiry_month,
-                                    allowed_issuers: [:visa, :mastercard],
-                                    allow_testcards: !Rails.env.production?
+                                    expiry_year: :expiry_year,                # default: :expiry_year
+                                    expiry_month: :expiry_month,              # default: :expiry_month
+                                    allowed_issuers: [:visa, :mastercard],    # default: all known issuers
+                                    allow_testcards: !Rails.env.production?   # default: False
                                   }
 
 end
