@@ -3,7 +3,7 @@ require 'date'
 
 describe CreditCardSupport::Instrument do
   let(:today) { Date.today }
-  subject { described_class.new(number: 4222222222222, expire_year: "#{today.year}", expire_month: "12", holder_name: 'A B', verification: '1234') }
+  subject { described_class.new(number: 4222222222222, expiry_year: "#{today.year}", expiry_month: "12", holder_name: 'A B', verification: '1234') }
 
   describe ".numbers" do
     it "returns hash containing of issuer: number_regexp" do
@@ -56,23 +56,23 @@ describe CreditCardSupport::Instrument do
     end
   end
 
-  describe "#expire_year" do
-    it "returns expire year as NNNN integer" do
-      subject.expire_year = "#{today.year-2000}"
-      subject.expire_year.should == today.year
+  describe "#expiry_year" do
+    it "returns expiry year as NNNN integer" do
+      subject.expiry_year = "#{today.year-2000}"
+      subject.expiry_year.should == today.year
     end
   end
 
-  describe "#expire_month" do
-    it "returns expire month as NN integer" do
-      subject.expire_month = "#{today.month}"
-      subject.expire_month.should == today.month
+  describe "#expiry_month" do
+    it "returns expiry month as NN integer" do
+      subject.expiry_month = "#{today.month}"
+      subject.expiry_month.should == today.month
     end
   end
 
-  describe "#expire_date" do
+  describe "#expiration_date" do
     it "returns last day of the month when expiring" do
-      subject.expire_date.should == Date.new(today.year, 12, 31)
+      subject.expiration_date.should == Date.new(today.year, 12, 31)
     end
   end
 
@@ -84,8 +84,8 @@ describe CreditCardSupport::Instrument do
     end
     context "expired" do
       it "returns true" do
-        subject.expire_year = today.year
-        subject.expire_month = today.month-1
+        subject.expiry_year = today.year
+        subject.expiry_month = today.month-1
         subject.expired?.should be_true
       end
     end

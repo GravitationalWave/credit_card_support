@@ -4,16 +4,16 @@ module CreditCardSupport
   #
   # credit_card = CreditCardSupport.Instrument.new(
   #    number: '4222222222222',
-  #    expire_year: 13,
-  #    expire_month: 11,
+  #    expiry_year: 13,
+  #    expiry_month: 11,
   #    holder_name: 'A B'
   #    verification: '1234'       # optional!
   #    )
   #
   # credit_card.expired?          # returns false
-  # credit_card.expire_date       # Date (last day of the month for expire month)
+  # credit_card.expiration_date   # Date (last day of the month for expiry month)
   # credit_card.issuer            # VISA
-  # credit_card.is_testcard?     # true
+  # credit_card.is_testcard?      # true
 
 
   class Instrument
@@ -106,8 +106,8 @@ module CreditCardSupport
     end
 
     attr_accessor   :number,
-                    :expire_year,
-                    :expire_month,
+                    :expiry_year,
+                    :expiry_month,
                     :holder_name,
                     :verification
 
@@ -115,8 +115,8 @@ module CreditCardSupport
 
     def initialize(opts={}, &block)
       self.number       = opts[:number]
-      self.expire_year  = opts[:expire_year]
-      self.expire_month = opts[:expire_month]
+      self.expiry_year  = opts[:expiry_year]
+      self.expiry_month = opts[:expiry_month]
       self.holder_name  = opts[:holder_name]
       self.verification = opts[:verification]
 
@@ -130,24 +130,24 @@ module CreditCardSupport
       @has_valid_luhn   = self.class.has_valid_luhn?(self.number)
     end
 
-    def expire_year=(expire_year)
-      @expire_year = expire_year.to_i
+    def expiry_year=(expiry_year)
+      @expiry_year = expiry_year.to_i
     end
 
-    def expire_month=(expire_month)
-      @expire_month = expire_month.to_i
+    def expiry_month=(expiry_month)
+      @expiry_month = expiry_month.to_i
     end
 
-    def expire_year
-      (@expire_year < 1900 ? 2000 + @expire_year : @expire_year) if @expire_year
+    def expiry_year
+      (@expiry_year < 1900 ? 2000 + @expiry_year : @expiry_year) if @expiry_year
     end
 
-    def expire_date
-      Date.new(expire_year, expire_month, -1)
+    def expiration_date
+      Date.new(expiry_year, expiry_month, -1)
     end
 
     def expired?
-      expire_date < Date.today
+      expiration_date < Date.today
     end
 
     def is_testcard?
