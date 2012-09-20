@@ -1,20 +1,8 @@
-Why?
-====
+CreditCardSupport
+=================
 
-Because I can!
-
-
-What?
-=====
-
-It is somewhat a ripp-off from
-* https://github.com/tobias/credit_card_validator
-
-and also inspired by
-* https://github.com/pda/am_credit_card
-
-
-Basic usage
+Basic usage without Rails
+-------------------------
 
 ```ruby
 credit_card = CreditCardSupport.Instrument.new(
@@ -30,3 +18,33 @@ credit_card.expire_date       # Date (last day of the month for expire month)
 credit_card.issuer            # VISA
 credit_card.is_testcard?     # true
 ```
+
+For better understanding read the source and RSpec.
+
+
+Basic usage with ActiveModel (if you are using Rails, you are using ActiveModel)
+--------------------------------------------------------------------------------
+
+```ruby
+class CreditCard < Your::BaseClass
+  include CreditCardSupport::For::ActiveModel
+
+  attr_accessor :number, :issuer, :expire_date, :holder_name
+  attr_accessable :number, :issuer,
+
+  validates :
+end
+```
+
+
+Inspired by
+===========
+
+* https://github.com/tobias/credit_card_validator
+* https://github.com/pda/am_credit_card
+
+
+Author
+======
+
+Margus Pärt

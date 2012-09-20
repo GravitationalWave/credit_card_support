@@ -1,6 +1,6 @@
 module CreditCardSupport
 
-  # Basic usage:
+  # Usage:
   #
   # credit_card = CreditCardSupport.Instrument.new(
   #    number: '4222222222222',
@@ -19,31 +19,50 @@ module CreditCardSupport
   class Instrument
 
     NUMBERS = {
-      visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
-      master_card: /^5[1-5][0-9]{14}$/,
-      maestro: /(^6759[0-9]{2}([0-9]{10})$)|(^6759[0-9]{2}([0-9]{12})$)|(^6759[0-9]{2}([0-9]{13})$)/,
-      diners_club: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/,
       amex: /^3[47][0-9]{13}$/,
-      discover: /^6(?:011|5[0-9]{2})[0-9]{12}$/
+      diners_club: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/,
+      discover: /^6(?:011|5[0-9]{2})[0-9]{12}$/,
+      enroute: /^2(014|149)\d{11}$/,
+      maestro: /(^6759[0-9]{2}([0-9]{10})$)|(^6759[0-9]{2}([0-9]{12})$)|(^6759[0-9]{2}([0-9]{13})$)/,
+      master_card: /^5[1-5][0-9]{14}$/,
+      jcb: /^35[0-9]{14}$/,
+      solo: /^6(3(34[5-9][0-9])|767[0-9]{2})\d{10}(\d{2,3})?$/,
+      visa: /^4[0-9]{12}(?:[0-9]{3})?$/
     }.freeze
 
     TESTCARD_NUMBERS = {
       amex: [
         '378282246310005',
         '371449635398431',
-        '378734493671000'
+        '378734493671000',
+        '343434343434343',
+        '371144371144376',
+        '341134113411347'
         ],
       diners_club: [
         '30569309025904',
-        '38520000023237'
+        '38520000023237',
+        '36438936438936'
         ],
       discover: [
         '6011000990139424',
-        '6011111111111117'
+        '6011111111111117',
+        '6011016011016011',
+        '6011000000000004',
+        '6011000995500000',
+        '6500000000000002'
         ],
       master_card: [
         '5555555555554444',
-        '5105105105105100'
+        '5105105105105100',
+        '5500005555555559',
+        '5555555555555557',
+        '5454545454545454',
+        '5555515555555551',
+        '5405222222222226',
+        '5478050000000007',
+        '5111005111051128',
+        '5112345112345114'
         ],
       visa: [
         '4111111111111111',
@@ -56,7 +75,11 @@ module CreditCardSupport
         '4217651111111119',
         '4500600000000061',
         '4000111111111115'
-        ]
+        ],
+      jcb: [
+        '3566003566003566',
+        '3528000000000007'
+      ]
     }.freeze
 
     def self.numbers
@@ -74,8 +97,12 @@ module CreditCardSupport
       nil
     end
 
-    def self.determine_is_testcard?(number)
+    def self.is_testcard?(number)
       testcard_numbers.values.flatten.include?(number)
+    end
+
+    def self.has_valid_luhn?(number)
+      CreditCardSupport::Luhn.is_valid?(number)
     end
 
     attr_accessor   :number,
@@ -84,23 +111,23 @@ module CreditCardSupport
                     :holder_name,
                     :verification
 
-    attr_reader     :issuer,
-                    :is_testcard
+    attr_reader :issuer
 
-    def initialize(opts={})
+    def initialize(opts={}, &block)
       self.number       = opts[:number]
       self.expire_year  = opts[:expire_year]
       self.expire_month = opts[:expire_month]
       self.holder_name  = opts[:holder_name]
       self.verification = opts[:verification]
+
+      block.call(self) if block
     end
 
     def number=(number)
-      if number
-        @number           = number.to_s.gsub(/[^0-9]/, '')
-        @issuer           = self.class.determine_issuer(self.number)
-        @is_testcard      = self.class.determine_is_testcard?(self.number)
-      end
+      @number           = number.to_s.gsub(/[^0-9]/, '')
+      @issuer           = self.class.determine_issuer(self.number)
+      @is_testcard      = self.class.is_testcard?(self.number)
+      @has_valid_luhn   = self.class.has_valid_luhn?(self.number)
     end
 
     def expire_year=(expire_year)
@@ -116,7 +143,7 @@ module CreditCardSupport
     end
 
     def expire_date
-      (expire_month == 12) ? Date.new(expire_year, 12, -1) : Date.new(expire_year, expire_month, -1)
+      Date.new(expire_year, expire_month, -1)
     end
 
     def expired?
@@ -124,7 +151,11 @@ module CreditCardSupport
     end
 
     def is_testcard?
-      is_testcard
+      @is_testcard
+    end
+
+    def has_valid_luhn?
+      @has_valid_luhn
     end
 
   end
