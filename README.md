@@ -4,7 +4,6 @@ CreditCardSupport
 Intro
 -----
 
-Has
 * Internationalization and localization support for validations
 * At the moment knows AMEX, DinersClub, Discover, Enroute, Maestro, MasterCard, JCB, Solo, VISA (if you need more, create an issue and request it :)
 
