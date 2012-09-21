@@ -1,6 +1,6 @@
 module CreditCardSupport
 
-  class Luhn
+  class LuhnNumber
 
     attr_accessor :full_number
 

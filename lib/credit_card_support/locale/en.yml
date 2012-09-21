@@ -1,0 +1,9 @@
+en:
+  credit_card_validator:
+    messages:
+      luhn_not_valid: "is not valid"
+      issuer_not_known: "not known issuer"
+      issuer_not_supported: "%{issuer} not supported"
+      testcard_not_supported: "testcards not supported"
+      cant_be_blank: "can't be blank"
+      is_expired: "is expired"

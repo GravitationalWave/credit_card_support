@@ -1,4 +1,5 @@
 raise "ActiveModel not included" unless Object.const_defined?(:ActiveModel)
+I18n.load_path << File.dirname(__FILE__) + '/locale/en.yml'
 
 class CreditCardValidator < ActiveModel::EachValidator
 
@@ -41,33 +42,37 @@ class CreditCardValidator < ActiveModel::EachValidator
   end
 
   def validate_luhn
-    errors.add(@opts[:number], "is not valid") unless @instrument.has_valid_luhn?
+    errors.add(@opts[:number], t(:luhn_not_valid)) unless @instrument.has_valid_luhn?
   end
 
   def validate_issuer
-    errors.add(@opts[:number], "not known issuer") unless @instrument.issuer
-    if @allowed_issuers and @instrument.issuer
-      errors.add(@opts[:number], "issuer #{@instrument.issuer.to_s.uppercase} is not supported") unless @allowed_issuers.map(&:to_sym).include?(@instrument.issuer)
+    errors.add(@opts[:number], t(:issuer_not_known)) unless @instrument.issuer
+    if @allowed_issuers and @instrument.issuer and !@allowed_issuers.map(&:to_sym).include?(@instrument.issuer)
+      errors.add(@opts[:number], t(:issuer_not_supported, issuer: @instrument.issuer.to_s.upcase))
     end
   end
 
   def validate_testcard
-    errors.add(@opts[:number], "is a testcard") if !@allow_testcards && @instrument.is_testcard?
+    errors.add(@opts[:number], t(:testcard_not_supported)) if !@allow_testcards && @instrument.is_testcard?
   end
 
   def validate_expiry_year
-    errors.add(@opts[:expiry_year], "is missing") unless @instrument.expiry_year
+    errors.add(@opts[:expiry_year], t(:cant_be_blank)) unless @instrument.expiry_year
   end
 
   def validate_expiry_month
-    errors.add(@opts[:expiry_month], "is missing") unless @instrument.expiry_month
+    errors.add(@opts[:expiry_month], t(:cant_be_blank)) unless @instrument.expiry_month
   end
 
   def validate_expiration_date
     if @instrument.expired?
-      errors.add(@opts[:expiry_year], "is in the past")
-      errors.add(@opts[:expiry_month], "is in the past")
+      errors.add(@opts[:expiry_year], t(:cant_be_expired))
+      errors.add(@opts[:expiry_month], t(:cant_be_expired))
     end
+  end
+
+  def t(code, *args)
+     I18n.t("credit_card_validator.messages.#{code}", *args)
   end
 
 end

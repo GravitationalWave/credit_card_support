@@ -102,7 +102,7 @@ module CreditCardSupport
     end
 
     def self.has_valid_luhn?(number)
-      CreditCardSupport::Luhn.new(number).valid?
+      CreditCardSupport::LuhnNumber.new(number).valid?
     end
 
     attr_accessor   :number,

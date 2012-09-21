@@ -70,8 +70,6 @@ describe CreditCardValidator do
         end
         context "valid number" do
           it "is valid" do
-            subject.valid?
-            puts subject.errors.inspect
             subject.should be_valid
           end
         end
