@@ -45,7 +45,7 @@ describe CreditCardValidator do
 
   describe "validatable" do
 
-    subject { CreditCardTest.new(number: '4000111111111115', expiry_year: today.year, expiry_month: today.month) }
+    subject { CreditCardTest.new(number: '4012888888881881', expiry_year: today.year, expiry_month: today.month) }
 
     it "is valid" do
       subject.should be_valid
@@ -64,7 +64,7 @@ describe CreditCardValidator do
         subject { CreditCardProduction.new(number: '4485071359608368', expiry_year: today.year, expiry_month: today.month) }
         context "testnumber" do
           it "is invalid" do
-            subject.number = '4000111111111115'
+            subject.number = '4012888888881881'
             subject.should be_invalid
           end
         end

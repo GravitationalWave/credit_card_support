@@ -1,7 +1,6 @@
 module CreditCardSupport
 
   class Luhn
-    MAGIC = [7, 3, 1]
 
     attr_accessor :full_number
 
@@ -17,16 +16,19 @@ module CreditCardSupport
       full_number[0, full_number.length-1] if full_number
     end
 
-    def checksum_part
+    def check_digit_part
       full_number[-1, 1] if full_number
     end
 
     def valid?
-      parts   = full_number.split(//).reverse
+      return false unless full_number and full_number.length > 2
+      parts   = full_number.split(//).map(&:to_i)
 
-      other   = true
+      double  = parts.length % 2 == 0
       parts   = parts.collect do |part|
-        (other = !other) ? part : part*2
+        number  = double ? part*2 : part
+        double  = !double
+        number
       end
 
       sum     = parts.join("").split(//).map(&:to_i).inject(:+)

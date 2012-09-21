@@ -41,13 +41,13 @@ class CreditCardValidator < ActiveModel::EachValidator
   end
 
   def validate_luhn
-    errors.add(@opts[:number], "not valid") unless @instrument.has_valid_luhn?
+    errors.add(@opts[:number], "is not valid") unless @instrument.has_valid_luhn?
   end
 
   def validate_issuer
     errors.add(@opts[:number], "not known issuer") unless @instrument.issuer
     if @allowed_issuers and @instrument.issuer
-      errors.add(@opts[:number], "issuer #{@instrument.issuer.uppercase} is not supported") unless @allowed_issuers.map(&:to_sym).include?(@instrument.issuer)
+      errors.add(@opts[:number], "issuer #{@instrument.issuer.to_s.uppercase} is not supported") unless @allowed_issuers.map(&:to_sym).include?(@instrument.issuer)
     end
   end
 
