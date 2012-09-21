@@ -1,53 +1,37 @@
-# encoding: utf-8
-
-require 'rubygems'
-require 'bundler'
-begin
-  Bundler.setup(:default, :development)
-rescue Bundler::BundlerError => e
-  $stderr.puts e.message
-  $stderr.puts "Run `bundle install` to install missing gems"
-  exit e.status_code
-end
-require 'rake'
-
-require 'jeweler'
-Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "credit_card_support"
-  gem.homepage = "http://github.com/mxrguspxrt/credit_card_support"
-  gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "margus@tione.eu"
-  gem.authors = ["mxrguspxrt"]
-  # dependencies defined in Gemfile
-end
-Jeweler::RubygemsDotOrgTasks.new
-
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
+# documentation
+namespace 'doc' do
+  task :generate do
+    puts `rm -rf ./doc`
+    puts `yard doc --exclude 'test' --exclude 'Rakefile' --exclude 'Gemfile'`
+  end
 end
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
+# vc
+namespace 'vc' do
+  task :commit do
+    puts `git add -A`
+    puts `git commit -a --message="#{ENV['message']}"`
+    puts `git push origin master`
+  end
 end
 
-task :default => :test
+# gem
+namespace 'gem' do
+  task :build do
+    puts `gem build credit_card_support.gemspec`
+  end
+  task :push do
+    puts `gem push credit_card_support*.gem`
+  end
+  task :remove_build do
+    puts `rm -rf credit_card_support*.gem`
+  end
+  task :publish => [:build, :push, :remove_build]
+end
 
-require 'rdoc/task'
-Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
-  rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "credit_card_support #{version}"
-  rdoc.rdoc_files.include('README*')
-  rdoc.rdoc_files.include('lib/**/*.rb')
+# tests
+namespace 'tests' do
+  task :run do
+    puts `rspec -f doc --color --tty`
+  end
 end

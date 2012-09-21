@@ -1,7 +1,9 @@
+require 'credit_card_support/version'
+
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'credit_card_support'
-  s.version     = '1.0.0'
+  s.version     = CreditCardSupport::Version::STRING
   s.summary     = 'Libary to handle CreditCard number, expiration and Luhn.'
   s.description = 'Detects issuer from number, has ActiveModel validations and translations support.'
 
