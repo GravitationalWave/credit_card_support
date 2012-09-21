@@ -76,17 +76,17 @@ describe CreditCardSupport::Instrument do
     end
   end
 
-  describe "#expired?" do
+  describe "#is_expired?" do
     context "not expired" do
       it "returns false" do
-        subject.expired?.should be_false
+        subject.is_expired?.should be_false
       end
     end
     context "expired" do
       it "returns true" do
         subject.expiry_year = today.year
         subject.expiry_month = today.month-1
-        subject.expired?.should be_true
+        subject.is_expired?.should be_true
       end
     end
   end

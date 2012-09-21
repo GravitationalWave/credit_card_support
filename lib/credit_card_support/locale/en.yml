@@ -7,3 +7,4 @@ en:
       testcard_not_supported: "testcards not supported"
       cant_be_blank: "can't be blank"
       is_expired: "is expired"
+      cant_be_so_far_in_the_future: "can't be so far in the future"

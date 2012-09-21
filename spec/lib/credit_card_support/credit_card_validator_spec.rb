@@ -1,6 +1,5 @@
-require 'spec_helper'
 require 'active_model'
-require 'credit_card_support/credit_card_validator'
+require 'spec_helper'
 
 
 class CreditCard
@@ -87,6 +86,12 @@ describe CreditCardValidator do
           subject.should be_valid
         end
       end
+      context "in the future too much" do
+        it "is valid" do
+          subject.expiry_year = today.year + 11
+          subject.should be_invalid
+        end
+      end
       context "in the past" do
         it "is invalid" do
           subject.expiry_year = today.year - 1
@@ -103,6 +108,8 @@ describe CreditCardValidator do
       context "in the future" do
         it "is valid" do
           subject.expiry_month = today.month + 1
+          subject.valid?
+          puts subject.errors.inspect
           subject.should be_valid
         end
       end

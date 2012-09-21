@@ -1,4 +1,3 @@
-raise "ActiveModel not included" unless Object.const_defined?(:ActiveModel)
 I18n.load_path << File.dirname(__FILE__) + '/locale/en.yml'
 
 class CreditCardValidator < ActiveModel::EachValidator
@@ -9,16 +8,20 @@ class CreditCardValidator < ActiveModel::EachValidator
     opts              = options.dup
     opts[:number]     ||= attribute
 
-    number            = record.send(opts[:number]||:number) rescue (raise ":number not defined")
-    expiry_year       = record.send(opts[:expiry_year]||:expiry_year) rescue (raise ":expiry_year not defined")
-    expiry_month      = record.send(opts[:expiry_month]||:expiry_month) rescue (raise ":expiry_month not defined")
+    @number_name        = opts[:number] || :number
+    @expiry_year_name   = opts[:expiry_year] || :expiry_year
+    @expiry_month_name  = opts[:expiry_month] || :expiry_month
+
+    @number           = record.send(@number_name)
+    @expiry_year      = record.send(@expiry_year_name)
+    @expiry_month      = record.send(@expiry_month_name)
     @allowed_issuers  = opts[:allowed_issuers]
     @allow_testcards  = opts[:allow_testcards]
 
-    @opts             = opts
-    @instrument       = CreditCardSupport::Instrument.new(number: number, expiry_year: expiry_year, expiry_month: expiry_month)
+    @instrument       = CreditCardSupport::Instrument.new(number: @number, expiry_year: @expiry_year, expiry_month: @expiry_month)
 
     validate_number
+    validate_expiration
   end
 
 
@@ -33,41 +36,47 @@ class CreditCardValidator < ActiveModel::EachValidator
   end
 
   def validate_number
-    validate_luhn
-    validate_issuer
-    validate_testcard
+    validate_number_luhn
+    validate_number_issuer
+    validate_number_testcard
+  end
+
+  def validate_expiration
     validate_expiry_year
     validate_expiry_month
-    validate_expiration_date rescue false
+    validate_expiration_date rescue nil
   end
 
-  def validate_luhn
-    errors.add(@opts[:number], t(:luhn_not_valid)) unless @instrument.has_valid_luhn?
+  def validate_number_luhn
+    errors.add(@number_name, t(:luhn_not_valid)) unless @instrument.has_valid_luhn?
   end
 
-  def validate_issuer
-    errors.add(@opts[:number], t(:issuer_not_known)) unless @instrument.issuer
+  def validate_number_issuer
+    errors.add(@number_name, t(:issuer_not_known)) unless @instrument.issuer
     if @allowed_issuers and @instrument.issuer and !@allowed_issuers.map(&:to_sym).include?(@instrument.issuer)
-      errors.add(@opts[:number], t(:issuer_not_supported, issuer: @instrument.issuer.to_s.upcase))
+      errors.add(@number_name, t(:issuer_not_supported, issuer: @instrument.issuer.to_s.upcase))
     end
   end
 
-  def validate_testcard
-    errors.add(@opts[:number], t(:testcard_not_supported)) if !@allow_testcards && @instrument.is_testcard?
+  def validate_number_testcard
+    errors.add(@number_name, t(:testcard_not_supported)) if !@allow_testcards && @instrument.is_testcard?
   end
 
   def validate_expiry_year
-    errors.add(@opts[:expiry_year], t(:cant_be_blank)) unless @instrument.expiry_year
+    errors.add(@expiry_year_name, t(:cant_be_blank)) unless @instrument.expiry_year
   end
 
   def validate_expiry_month
-    errors.add(@opts[:expiry_month], t(:cant_be_blank)) unless @instrument.expiry_month
+    errors.add(@expiry_month_name, t(:cant_be_blank)) unless @instrument.expiry_month
   end
 
   def validate_expiration_date
-    if @instrument.expired?
-      errors.add(@opts[:expiry_year], t(:cant_be_expired))
-      errors.add(@opts[:expiry_month], t(:cant_be_expired))
+    if @instrument.is_expired?
+      errors.add(@expiry_year_name, t(:cant_be_expired))
+      errors.add(@expiry_month_name, t(:cant_be_expired))
+    end
+    if @instrument.expiration_date > Date.new(Date.today.year+10)
+      errors.add(@expiry_year_name, t(:cant_be_so_far_in_the_future))
     end
   end
 

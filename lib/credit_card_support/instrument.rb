@@ -143,10 +143,10 @@ module CreditCardSupport
     end
 
     def expiration_date
-      Date.new(expiry_year, expiry_month, -1)
+      Date.new(expiry_year, expiry_month, -1) rescue nil
     end
 
-    def expired?
+    def is_expired?
       expiration_date < Date.today
     end
 
