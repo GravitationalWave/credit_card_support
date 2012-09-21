@@ -34,7 +34,7 @@ Validations support
 
 ### Define
 
-#### ActiveRecord or Mongoid
+##### ActiveRecord or Mongoid
 
 ```ruby
 class CreditCard < ActiveRecord::Base
@@ -51,7 +51,7 @@ class CreditCard < ActiveRecord::Base
 end
 ```
 
-#### Only ActiveModel
+##### Only ActiveModel
 
 ```ruby
 class CreditCard
