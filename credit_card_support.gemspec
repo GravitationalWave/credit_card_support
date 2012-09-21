@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.email             = 'margus@tione.eu'
   s.homepage          = 'https://github.com/tione/credit_card_support'
 
-  s.files        = Dir['Gemfile', 'README.md', 'LICENSE.txt', 'lib/**/*', 'spec/**/*']
+  s.files        = Dir['Gemfile', 'README.md', 'LICENSE.txt', 'HISTORY.txt', 'lib/**/*', 'spec/**/*']
   s.require_path = 'lib'
 end
 

@@ -1,0 +1,8 @@
+1.0.1
+
+Redid validator loading - its automatically loaded if ActiveModel is loaded.
+
+
+1.0.0
+
+Initial.
