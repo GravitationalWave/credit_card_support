@@ -20,7 +20,7 @@ credit_card = CreditCardSupport.Instrument.new(
   verification: '1234'       # optional!
 )
 
-credit_card.expired?          # returns false
+credit_card.is_expired?          # returns false
 credit_card.expire_date       # Date (last day of the month for expire month)
 credit_card.issuer            # VISA
 credit_card.is_testcard?     # true
