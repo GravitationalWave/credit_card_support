@@ -12,18 +12,19 @@ Basic usage
 -----------
 
 ```ruby
-credit_card = CreditCardSupport::Instrument.new(
-  number: '4222222222222',
-  expiry_year: 13,
-  expiry_month: 11,
-  holder_name: 'A B',        # optional
-  verification: '1234'       # optional
-)
+# for a String object
+credit_card_number = "5500005555555559"
+credit_card_number.extend(CreditCardSupport::CreditCardNumber)
 
-credit_card.is_expired?       # returns false
-credit_card.expiration_date   # Date (last day of the month for expire month)
-credit_card.issuer            # :visa
-credit_card.is_testcard?      # true
+# or for all the Strings
+class String
+  include CreditCardSupport::CreditCardNumber)
+end
+
+# Usage
+credit_card_number.luhn?   # true
+credit_card_number.issuer  # :visa
+credit_card_number.test?   # true
 ```
 
 For better understanding read the source and RSpec.
@@ -32,28 +33,36 @@ For better understanding read the source and RSpec.
 Validations support
 -------------------
 
+* validates Luhn (http://en.wikipedia.org/wiki/Luhn_algorithm)
+* validates issuer
+* validates that number is not a test number
+* for presence, length etc, please use Rails already existing validators :)
+
 ### Define
 
-##### ActiveRecord or Mongoid
+#### ActiveRecord or Mongoid
 
 ```ruby
 class CreditCard < ActiveRecord::Base
 
-  attr_accessible :number, :expiry_year, :expiry_month
+  attr_accessible :number
 
-  validates :number, credit_card: {
-                                    expiry_year: :expiry_year,                # default: :expiry_year
-                                    expiry_month: :expiry_month,              # default: :expiry_month
-                                    allowed_issuers: [:visa, :mastercard],    # default: all known issuers
-                                    allow_testcards: true                     # default: False
-                                  }
+  validates :number, presence: true,
+                      length: {
+                        minimum: 13,
+                        maximum: 19
+                        },
+                      credit_card_number: {
+                        allow_testcards: true,
+                        allow_issuers: [:visa, :master_card]
+                      }
 
 end
 ```
 
-##### Only ActiveModel
+#### Only ActiveModel
 
-###### Rails 3
+##### Rails 3
 
 ```ruby
 class CreditCard
@@ -62,23 +71,27 @@ class CreditCard
   include ActiveModel::Validations
   include ActiveModel::Conversion
 
-  attr_accessor :number, :expiry_year, :expiry_month
+  attr_accessor :number, :expiry_year, :expiry_month, :errors
 
   def initialize(opts={})
+    @errors = ActiveModel::Errors.new(self)
     opts.each {|key, value| send(:"#{key}=", value) }
   end
 
-  validates :number, credit_card: {
-                                    expiry_year: :expiry_year,                # default: :expiry_year
-                                    expiry_month: :expiry_month,              # default: :expiry_month
-                                    allowed_issuers: [:visa, :mastercard],    # default: all known issuers
-                                    allow_testcards: true   # default: False
-                                  }
+  validates :number, presence: true,
+                      length: {
+                        minimum: 13,
+                        maximum: 19
+                        },
+                      credit_card_number: {
+                        allow_testcards: true,
+                        allow_issuers: [:visa, :master_card]
+                      }
 
 end
 ```
 
-###### Rails 4
+##### Rails 4
 
 ```ruby
 class CreditCard
@@ -86,12 +99,15 @@ class CreditCard
 
   attr_accessor :number, :expiry_year, :expiry_month
 
-  validates :number, credit_card: {
-                                    expiry_year: :expiry_year,                # default: :expiry_year
-                                    expiry_month: :expiry_month,              # default: :expiry_month
-                                    allowed_issuers: [:visa, :mastercard],    # default: all known issuers
-                                    allow_testcards: true                     # default: False
-                                  }
+  validates :number, presence: true,
+                      length: {
+                        minimum: 13,
+                        maximum: 19
+                        },
+                      credit_card_number: {
+                        allow_testcards: true,
+                        allow_issuers: [:visa, :master_card]
+                      }
 
 end
 ```
@@ -105,20 +121,12 @@ today      = Date.today
 ```
 
 ```ruby
-# RAILS_ENV == 'test'
-creditcard = CreditCard.new(number: '4000111111111115', expiry_year: today.year, expiry_month: today.month)
-creditcard.valid? # True
+creditcard = CreditCard.new(number: '4000111111111115')
+creditcard.valid?             # true
 
-# RAILS_ENV == 'production'
-creditcard = CreditCard.new(number: '4000111111111115', expiry_year: today.year, expiry_month: today.month)
-creditcard.valid? # False
-creditcard.errors # {number: ["is a test number"]}
-
-# RAILS_ENV == 'test'
-creditcard = CreditCard.new(number: '3566003566003566', expiry_year: today.year-1, expiry_month: today.month)
-creditcard.valid? # False
-creditcard.errors # {number: ["is a JCB card number and is not supported", expiry_year: ["is in the past"], expiry_month: ["is in the past"]]}
-
+# in case of allow_testcards is set to false
+creditcard.valid?             # false
+creditcard.errors             # <ActiveModel::Errors: ... @messages={:number=>["testcards not supported"]}>
 ```
 
 
