@@ -12,18 +12,18 @@ Basic usage
 -----------
 
 ```ruby
-credit_card = CreditCardSupport.Instrument.new(
+credit_card = CreditCardSupport::Instrument.new(
   number: '4222222222222',
-  expire_year: 13,
-  expire_month: 11,
-  holder_name: 'A B'         # optional!
-  verification: '1234'       # optional!
+  expiry_year: 13,
+  expiry_month: 11,
+  holder_name: 'A B',        # optional
+  verification: '1234'       # optional
 )
 
-credit_card.is_expired?          # returns false
-credit_card.expire_date       # Date (last day of the month for expire month)
-credit_card.issuer            # VISA
-credit_card.is_testcard?     # true
+credit_card.is_expired?       # returns false
+credit_card.expiration_date   # Date (last day of the month for expire month)
+credit_card.issuer            # :visa
+credit_card.is_testcard?      # true
 ```
 
 For better understanding read the source and RSpec.
@@ -39,19 +39,21 @@ Validations support
 ```ruby
 class CreditCard < ActiveRecord::Base
 
-  attr_accessable :number, :expiry_year, :expiry_month
+  attr_accessible :number, :expiry_year, :expiry_month
 
   validates :number, credit_card: {
                                     expiry_year: :expiry_year,                # default: :expiry_year
                                     expiry_month: :expiry_month,              # default: :expiry_month
                                     allowed_issuers: [:visa, :mastercard],    # default: all known issuers
-                                    allow_testcards: !Rails.env.production?   # default: False
+                                    allow_testcards: true                     # default: False
                                   }
 
 end
 ```
 
 ##### Only ActiveModel
+
+###### Rails 3
 
 ```ruby
 class CreditCard
@@ -61,13 +63,34 @@ class CreditCard
   include ActiveModel::Conversion
 
   attr_accessor :number, :expiry_year, :expiry_month
-  attr_accessable :number, :expiry_year, :expiry_month
+
+  def initialize(opts={})
+    opts.each {|key, value| send(:"#{key}=", value) }
+  end
 
   validates :number, credit_card: {
                                     expiry_year: :expiry_year,                # default: :expiry_year
                                     expiry_month: :expiry_month,              # default: :expiry_month
                                     allowed_issuers: [:visa, :mastercard],    # default: all known issuers
-                                    allow_testcards: !Rails.env.production?   # default: False
+                                    allow_testcards: true   # default: False
+                                  }
+
+end
+```
+
+###### Rails 4
+
+```ruby
+class CreditCard
+  include ActiveModel::Model
+
+  attr_accessor :number, :expiry_year, :expiry_month
+
+  validates :number, credit_card: {
+                                    expiry_year: :expiry_year,                # default: :expiry_year
+                                    expiry_month: :expiry_month,              # default: :expiry_month
+                                    allowed_issuers: [:visa, :mastercard],    # default: all known issuers
+                                    allow_testcards: true                     # default: False
                                   }
 
 end
