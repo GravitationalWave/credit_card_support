@@ -1,3 +1,8 @@
+1.0.2
+
+Readme improvement.
+
+
 1.0.1
 
 Redid validator loading - its automatically loaded if ActiveModel is loaded.
