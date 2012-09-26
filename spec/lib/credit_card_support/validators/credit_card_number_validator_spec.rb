@@ -47,7 +47,7 @@ class CreditCardProduction < CreditCard
 end
 
 
-describe CreditCardNumberValidator do
+describe ActiveModel::Validations::CreditCardNumberValidator do
   subject { CreditCardTest.new(number: '4012888888881881') }
 
   it "is valid" do
