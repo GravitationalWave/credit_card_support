@@ -18,7 +18,7 @@ credit_card_number.extend(CreditCardSupport::CreditCardNumber)
 
 # or for all the Strings
 class String
-  include CreditCardSupport::CreditCardNumber)
+  include CreditCardSupport::CreditCardNumber
 end
 
 # Usage
@@ -75,7 +75,7 @@ class CreditCard
 
   def initialize(opts={})
     @errors = ActiveModel::Errors.new(self)
-    opts.each {|key, value| send(:"#{key}=", value) }
+    opts.each {|key, value| send("#{key}=", value) }
   end
 
   validates :number, presence: true,
