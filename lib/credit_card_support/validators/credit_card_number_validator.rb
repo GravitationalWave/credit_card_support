@@ -7,7 +7,7 @@ module ActiveModel
       def validate_each(record, attribute, value)
         @record     = record
         @attribute  = attribute
-        @value      = value
+        @value      = "#{value}"
 
         @value.extend(CreditCardSupport::CreditCardNumber)
 

@@ -48,7 +48,7 @@ end
 
 
 describe ActiveModel::Validations::CreditCardNumberValidator do
-  subject { CreditCardTest.new(number: '4012888888881881') }
+  subject { CreditCardTest.new(number: '4012888888881881'.freeze) }
 
   it "is valid" do
     subject.should be_valid
