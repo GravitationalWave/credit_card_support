@@ -8,6 +8,22 @@ Intro
 * At the moment knows AMEX, DinersClub, Discover, Enroute, Maestro, MasterCard, JCB, Solo, VISA (if you need more, create an issue and request for it :)
 
 
+Installation
+------------
+
+Into your Gemfile add:
+
+```ruby
+gem 'credit_card_support'
+```
+
+Or in shell:
+
+```bash
+gem install credit_card_support
+```
+
+
 Basic usage
 -----------
 
