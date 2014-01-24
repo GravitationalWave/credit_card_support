@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
 
   s.files        = Dir['Gemfile', 'README.md', 'LICENSE.txt', 'HISTORY.txt', 'lib/**/*', 'spec/**/*']
   s.require_path = 'lib'
+  s.license      = 'MIT'
 
   s.add_dependency "activemodel"
   s.add_development_dependency "rspec"
