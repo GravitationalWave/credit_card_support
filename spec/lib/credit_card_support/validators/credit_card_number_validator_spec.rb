@@ -23,27 +23,31 @@ class CreditCard
 end
 
 class CreditCardTest < CreditCard
-  validates :number, presence: true,
-                      length: {
-                        minimum: 13,
-                        maximum: 19
-                        },
-                      credit_card_number: {
-                        allow_testcards: true,
-                        allow_issuers: [:visa, :master_card]
-                      }
+  validates :number,
+  credit_card_number: true,
+  credit_card_support: {
+    allow_testcards: true,
+    allow_issuers: [:visa, :master_card]
+  }
+end
+
+class CreditCardWithCustomMessage < CreditCard
+  validates :number,
+  credit_card_number: { message: 'Luhn fail!' },
+  credit_card_support: {
+    allow_testcards: true,
+    allow_issuers: [:visa, :master_card],
+    message: "Not supported!"
+  }
 end
 
 class CreditCardProduction < CreditCard
-  validates :number, presence: true,
-                      length: {
-                        minimum: 13,
-                        maximum: 19
-                        },
-                      credit_card_number: {
-                        allow_testcards: false,
-                        allow_issuers: [:visa, :master_card]
-                      }
+  validates :number,
+  credit_card_number: true,
+  credit_card_support: {
+    allow_testcards: false,
+    allow_issuers: [:visa, :master_card]
+  }
 end
 
 
@@ -63,6 +67,23 @@ describe ActiveModel::Validations::CreditCardNumberValidator do
       subject.number = '4012888888881882'
       subject.should_not be_valid
     end
+
+    context "with custom card support messages" do
+      subject { CreditCardWithCustomMessage.new(number: '3528000000000007') }
+      it "has a custom message" do
+        subject.valid?
+        subject.errors[:number].first.should == 'Not supported!'
+      end
+    end
+
+    context "with custom luhn calculation failure messages" do
+      subject { CreditCardWithCustomMessage.new(number: '4111111111111112') }
+      it "has a custom message" do
+        subject.valid?
+        subject.errors[:number].first.should == 'Luhn fail!'
+      end
+    end
+
     context "production" do
       subject { CreditCardProduction.new(number: '4485071359608368') }
       context "testnumber" do
