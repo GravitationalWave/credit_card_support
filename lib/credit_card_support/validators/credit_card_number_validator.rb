@@ -2,7 +2,7 @@ I18n.load_path << File.dirname(__FILE__) + '/../locale/en.yml'
 
 module ActiveModel
   module Validations
-    class CreditCardNumberValidator < ActiveModel::EachValidator
+    class CreditCardSupportValidator < ActiveModel::EachValidator
 
       def validate_each(record, attribute, value)
         @record     = record
@@ -11,18 +11,8 @@ module ActiveModel
 
         @value.extend(CreditCardSupport::CreditCardNumber)
 
-        validates_luhn &&
         validates_testcard &&
         validates_issuer_allowed
-      end
-
-      def validates_luhn
-        if !@value.luhn?
-          @record.errors.add(@attribute, t(:luhn_not_valid))
-          false
-        else
-          true
-        end
       end
 
       def validates_testcard
@@ -36,7 +26,7 @@ module ActiveModel
 
       def validates_issuer_allowed
         if options[:allow_issuers] && !options[:allow_issuers].include?(@value.issuer)
-          @record.errors.add(@attribute, t(:issuer_not_supported, issuer: @value.issuer))
+          @record.errors.add(@attribute, options[:message] || t(:issuer_not_supported, issuer: @value.issuer))
           false
         else
           true
@@ -47,6 +37,31 @@ module ActiveModel
          I18n.t("credit_card_support.validators.number.messages.#{code}", *args)
       end
 
+    end
+    class CreditCardNumberValidator < ActiveModel::EachValidator
+
+      def validate_each(record, attribute, value)
+        @record     = record
+        @attribute  = attribute
+        @value      = "#{value}"
+
+        @value.extend(CreditCardSupport::CreditCardNumber)
+
+        validates_luhn
+      end
+
+      def validates_luhn
+        if !@value.luhn?
+          @record.errors.add(@attribute, options[:message] || t(:luhn_not_valid))
+          false
+        else
+          true
+        end
+      end
+
+      def t(code, *args)
+         I18n.t("credit_card_support.validators.number.messages.#{code}", *args)
+      end
     end
   end
 end
