@@ -41,6 +41,16 @@ class CreditCardWithCustomMessage < CreditCard
   }
 end
 
+class CreditCardWithCustomLambdaMessage < CreditCard
+  validates :number,
+  credit_card_number: { message: ->(trans_string, context){ "Luhn fail! #{trans_string} #{context[:value]}" } },
+  credit_card_support: {
+    allow_testcards: false,
+    allow_issuers: [:visa, :master_card],
+    message: ->(trans_string, context){ "Not supported! #{trans_string} #{context[:value]}" }
+  }
+end
+
 class CreditCardProduction < CreditCard
   validates :number,
   credit_card_number: true,
@@ -66,6 +76,13 @@ describe ActiveModel::Validations::CreditCardNumberValidator do
     it "must be luhn" do
       subject.number = '4012888888881882'
       subject.should_not be_valid
+      subject.errors[:number].first.should == 'is not valid'
+    end
+
+    it "must reject unsupported cards" do
+      subject.number = '3528000000000007'
+      subject.should_not be_valid
+      subject.errors[:number].first.should == 'jcb not supported'
     end
 
     context "with custom card support messages" do
@@ -84,12 +101,37 @@ describe ActiveModel::Validations::CreditCardNumberValidator do
       end
     end
 
+    context "with custom card support messages in lambda form" do
+      subject { CreditCardWithCustomLambdaMessage.new(number: '3528000000000007') }
+      it "has a custom message" do
+        subject.valid?
+        subject.errors[:number].first.should == 'Not supported! activemodel.errors.models.credit_card_with_custom_lambda_message.attributes.number.testcard_not_supported 3528000000000007'
+      end
+    end
+
+    context "with custom test card support messages in lambda form" do
+      subject { CreditCardWithCustomLambdaMessage.new(number: '4111111111111111') }
+      it "has a custom message" do
+        subject.valid?
+        subject.errors[:number].first.should == 'Not supported! activemodel.errors.models.credit_card_with_custom_lambda_message.attributes.number.testcard_not_supported 4111111111111111'
+      end
+    end
+
+    context "with custom luhn calculation failure messages in lambda form" do
+      subject { CreditCardWithCustomLambdaMessage.new(number: '4111111111111112') }
+      it "has a custom message" do
+        subject.valid?
+        subject.errors[:number].first.should == 'Luhn fail! activemodel.errors.models.credit_card_with_custom_lambda_message.attributes.number.luhn_not_valid 4111111111111112'
+      end
+    end
+
     context "production" do
       subject { CreditCardProduction.new(number: '4485071359608368') }
       context "testnumber" do
         it "is invalid" do
           subject.number = '4012888888881881'
           subject.should be_invalid
+          subject.errors[:number].first.should == 'testcards not supported'
         end
       end
       context "valid number" do
