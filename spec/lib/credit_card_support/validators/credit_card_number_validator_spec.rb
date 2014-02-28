@@ -73,6 +73,7 @@ describe ActiveModel::Validations::CreditCardNumberValidator do
       subject.number = nil
       subject.should_not be_valid
     end
+
     it "must be luhn" do
       subject.number = '4012888888881882'
       subject.should_not be_valid
@@ -83,6 +84,11 @@ describe ActiveModel::Validations::CreditCardNumberValidator do
       subject.number = '3528000000000007'
       subject.should_not be_valid
       subject.errors[:number].first.should == 'jcb not supported'
+    end
+
+    it "must support random whitespace around card numbers" do
+      subject.number = ' 4012 8888 8 8 8 8 1881    '
+      subject.should be_valid
     end
 
     context "with custom card support messages" do
