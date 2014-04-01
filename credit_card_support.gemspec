@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require File.dirname(__FILE__)+"/lib/credit_card_support/version"
 
 Gem::Specification.new do |s|
